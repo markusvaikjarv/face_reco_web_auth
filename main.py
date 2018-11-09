@@ -5,24 +5,18 @@ import datetime
 
 import face_recognition
 
-@route('/') # or @route('/login')
+@route('/login') # or @route('/login')
 def index():
-    return '''
-        <form action="/upload" method="post" enctype="multipart/form-data">
-        Kasutajanimi: <input type="text" name="kasutajanimi" />
-        Select a file: <input type="file" name="upload" />
-        <input type="submit" value="Autentikeeri" />
-        </form>
-    '''
-#@route('/templatetest', method="GET")
-#def ttest():
-#    return template("template.tpl")
+    return template("login.tpl")
+
+
+
 
 @route('/upload', method='POST')
 def do_upload():
     upload     = request.files.get('upload')
     kasutajanimi = request.forms.get('kasutajanimi')
-    name, ext = os.path.splitext(upload.filename) #_ on failinimi ilma extensionita
+    _, ext = os.path.splitext(upload.filename) #_ on failinimi ilma extensionita
     if ext not in ('.png','.jpg','.jpeg'):
         return 'File extension not allowed.'
     upload.filename = str(datetime.datetime.now())
@@ -45,7 +39,6 @@ def do_upload():
     except NameError:
         return "Fail"
 
-    #return 'OK'
 
 
 run(host='localhost', port=8080)

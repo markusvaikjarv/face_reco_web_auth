@@ -1,3 +1,4 @@
+from PIL import Image, ExifTags
 from bottle import route, app, Request, request, run, template
 import os
 import datetime
@@ -29,9 +30,29 @@ def login_upload():
     _, ext = os.path.splitext(upload.filename) #_ on failinimi ilma extensionita
     if ext not in ('.png','.jpg','.jpeg'):
         return 'File extension not allowed.'
-    upload.filename = str(datetime.datetime.now())
-    save_path = "/home/markus/recotest/uploadid/"
+    upload.filename = str(datetime.datetime.now())+".jpg"
+    save_path = os.getcwd()+"/uploadid/"
     upload.save(save_path) # failinimi lisatakse save_pathile automaatselt
+    
+    try: #kontrollin EXIF rotation informatsiooni, vajadusel panen pildi õiget pidi
+        image=Image.open(os.getcwd()+"/uploadid/"+upload.filename)
+        for orientation in ExifTags.TAGS.keys():
+            if ExifTags.TAGS[orientation]=='Orientation':
+                break
+        exif=dict(image._getexif().items())
+
+        if exif[orientation] == 3:
+            image=image.rotate(180, expand=True)
+        elif exif[orientation] == 6:
+            image=image.rotate(270, expand=True)
+        elif exif[orientation] == 8:
+            image=image.rotate(90, expand=True)
+        image.save(os.getcwd()+"/uploadid/"+upload.filename)
+        image.close()
+
+    except (AttributeError, KeyError, IndexError):
+        # cases: image don't have getexif
+        pass
 
     try:  #laen pildid programmi
         known_image = face_recognition.load_image_file(os.getcwd()+"/kasutajad/"+kasutajanimi+".jpg")
@@ -71,6 +92,26 @@ def register_upload():
         upload.save(save_path) # appends upload.filename automatically upload.file on fail
     except IOError:
         return template("./templates/error.tpl", error="Registreerimine ebaõnnestus. Antud nimega kasutaja juba eksisteerib")
+
+    try:    #kontrollin EXIF rotation informatsiooni, vajadusel panen pildi õiget pidi
+        image=Image.open(os.getcwd()+"/kasutajad/"+kasutajanimi+".jpg")
+        for orientation in ExifTags.TAGS.keys():
+            if ExifTags.TAGS[orientation]=='Orientation':
+                break
+        exif=dict(image._getexif().items())
+
+        if exif[orientation] == 3:
+            image=image.rotate(180, expand=True)
+        elif exif[orientation] == 6:
+            image=image.rotate(270, expand=True)
+        elif exif[orientation] == 8:
+            image=image.rotate(90, expand=True)
+        image.save(os.getcwd()+"/kasutajad/"+kasutajanimi+".jpg")
+        image.close()
+
+    except (AttributeError, KeyError, IndexError):
+        # cases: image don't have getexif
+        pass
     
     uus_kasutaja_pilt = face_recognition.load_image_file(os.getcwd()+"/kasutajad/"+kasutajanimi+".jpg")
     try: #kontrollin kas pildil on nägu

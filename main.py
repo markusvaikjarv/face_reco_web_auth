@@ -1,3 +1,4 @@
+
 from PIL import Image, ExifTags
 from bottle import route, app, Request, request, run, template
 import os
@@ -121,8 +122,8 @@ def register_upload():
         return template("./templates/error.tpl", error="Registreerimine ebaõnnestus. Pildil ei tuvastatud nägu")
     return template("./templates/register_success.tpl")
     
-
 run(host='localhost', port=8080)
+# production: run(host='localhost', server='bjoern', port=8080)
 
 
 

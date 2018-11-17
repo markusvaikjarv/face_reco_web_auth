@@ -52,7 +52,7 @@ def login_upload():
         image.close()
 
     except (AttributeError, KeyError, IndexError):
-        # cases: image don't have getexif
+        # pildil ei ole EXIF atrubuute
         pass
 
     try:  #laen pildid programmi
@@ -111,7 +111,7 @@ def register_upload():
         image.close()
 
     except (AttributeError, KeyError, IndexError):
-        # cases: image don't have getexif
+        # pildil ei ole EXIF atribuute
         pass
     
     uus_kasutaja_pilt = face_recognition.load_image_file(os.getcwd()+"/kasutajad/"+kasutajanimi+".jpg")

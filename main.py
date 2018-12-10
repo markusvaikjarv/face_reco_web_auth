@@ -1,10 +1,24 @@
 
 from PIL import Image, ExifTags
 from bottle import route, app, Request, request, run, template
+from peewee import *
 import os
 import datetime
-
 import face_recognition
+import hashlib
+
+db = SqliteDatabase('kasutajad.db')
+
+class Kasutaja(Model):
+    kasutajanimi = CharField()
+    parool = CharField()
+    kasutaja_tekst = CharField()
+
+    class Meta:
+        database = db # This model uses the "people.db" database.
+
+db.connect()
+db.create_tables([Kasutaja])
 
 @route('/')
 def index():
@@ -20,14 +34,20 @@ def register():
 
 @route('/error')
 def error():
-    return template("./templates/error.tpl", error="testiarror")
+    return template("./templates/error.tpl", error="")
 
 
 
 @route('/loginupload', method='POST')
 def login_upload():
-    upload     = request.files.get('upload')
+    upload = request.files.get('upload')
     kasutajanimi = request.forms.get('kasutajanimi')
+    parool = request.forms.get('parool')
+    hashed_parool = hashlib.sha256(str(parool).encode('utf-8')).hexdigest()
+
+    kasutaja = Kasutaja.get(Kasutaja.kasutajanimi == kasutajanimi)
+
+
     _, ext = os.path.splitext(upload.filename) #_ on failinimi ilma extensionita
     if ext not in ('.png','.jpg','.jpeg'):
         return 'File extension not allowed.'
@@ -70,7 +90,10 @@ def login_upload():
     try: #teostan nägude võrdluse
         results = face_recognition.compare_faces([markus_encoding], unknown_encoding)
         if results[0] == True:
-            return template("./templates/login_success.tpl", pealkiri='Sisselogimine õnnestus', sonum='todo:väljasta auth token')
+            if kasutaja.parool == hashed_parool:
+                return template("./templates/login_success.tpl", pealkiri='Sisselogimine õnnestus', sonum='Olete sisenenud kui: ' + kasutajanimi)
+            else:
+                return template("./templates/error.tpl", error="Sisselogimine ebaõnnestus. Sisestatud parool on vale")
         else:
             return template("./templates/error.tpl", error="Sisselogimine ebaõnnestus. Nägu ei vasta kasutajale.")
         return str(results[0])
@@ -81,6 +104,9 @@ def login_upload():
 def register_upload():
     upload     = request.files.get('upload')
     kasutajanimi = request.forms.get('kasutajanimi')
+    parool = request.forms.get('parool')
+    hashed_parool = hashlib.sha256(str(parool).encode('utf-8')).hexdigest()
+    print(hashed_parool)
 
     _, ext = os.path.splitext(upload.filename) #_ on failinimi ilma extensionita
     if ext not in ('.png','.jpg','.jpeg'):
@@ -120,11 +146,12 @@ def register_upload():
     except IndexError:
         os.remove(os.getcwd()+"/kasutajad/"+kasutajanimi+".jpg") #kustutan pildi, millel nägu ei tuvastatud
         return template("./templates/error.tpl", error="Registreerimine ebaõnnestus. Pildil ei tuvastatud nägu")
+    uus_kasutaja = Kasutaja.create(kasutajanimi=kasutajanimi, parool=hashed_parool, kasutaja_tekst="Salvestage siia oma märkmed") #Salvestab kasutaja sqlite anmdebaasi
+    uus_kasutaja.save()
     return template("./templates/register_success.tpl")
     
 run(host='localhost', port=8080)
 # production: run(host='localhost', server='bjoern', port=8080)
-
 
 
 

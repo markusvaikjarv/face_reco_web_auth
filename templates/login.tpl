@@ -15,7 +15,7 @@
         <h1 class="has-text-centered is-size-3">Logi sisse</h1>
         <form action="/loginupload" method="post" enctype="multipart/form-data">
             <input class="input is-rounded" required="true" type="text" placeholder="Kasutajanimi" name="kasutajanimi" />
-            <input class="input is-rounded" type="text" placeholder="Parool(ToDo)" name="parool" disabled>
+            <input class="input is-rounded" type="password" placeholder="Parool" required="true" name="parool" />
             <div class="container has-text-centered">
                 <button id="kaameranupp" class="button is-danger kaamera-button" onclick="take_picture()"><i class="fas fa-video kaamera-ikoon"></i>Käivita
                     kaamera</button>

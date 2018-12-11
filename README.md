@@ -1,9 +1,3 @@
 # face_reco_web_auth
-Web authentication based on face recognition. PROGRAMMEERIMINE_2018_TÜ
-Dependencies:
-+Python3
-+face_recognition teek (ja dlib Pythoni bindingutega)
-+bottle.py teek (repos olemas)
-++libev-dev (event loop)
-+bjoern (WSGI server)
-+pillow (pilditöötluse teek)
+Näotuvastusega veebimärkmik. Lisaks Python3 teekidele on vajalik ka sqlite3 ja dlib olemasolu.
+Demoversioon markusv.me (Veebikaamera funktsionaalsus toimib SSL certi puudumise tõttu vaid Firefoxis).

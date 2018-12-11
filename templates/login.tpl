@@ -22,7 +22,7 @@
             </div>
             <div class="container has-text-centered">
                 <div class="upload-btn-wrapper">
-                    <button class="filebtn">Vali pilt</button>
+                    <button class="filebtn"><i class="far fa-image kaamera-ikoon"></i>Vali pilt</button>
                     <input accept="image/jpeg" required="true" type="file" name="upload" />
                 </div>
             </div>
@@ -75,18 +75,27 @@
         (() => {if(performance.navigation.type == 2){
             location.reload(true);
         }})() //vajalik selleks, et "tagasi" nuppu vajutades form puhas oleks
+
+        const isOpera = (!!window.opr && !!opr.addons) || !!window.opera || navigator.userAgent.indexOf(' OPR/') >= 0;
+        const isChrome = !!window.chrome && !!window.chrome.webstore;
+        const isBlink = (isChrome || isOpera) && !!window.CSS;
+// Kui leht on productionis siis viskab errori kui SSL ceri pole ja klient kasutab Chrome
+//        if (location.protocol !== 'https:') {
+//            if (isBlink) {alert("Kasutad Chromel põhinevat brauserit. Kuna veebilehel puudub SSL cert ei tööta ka veebikaamera funktsionaalsus. Proovi kasutada FireFoxi.")}
+//        }
+
         function take_picture() {
             document.getElementById("kaameranupp").innerText = "Salvesta pilt"
             const vid = document.querySelector('video');
             vid.style.display = "none"
             navigator.mediaDevices.getUserMedia({
                     video: true
-                }) // request cam
+                }) 
                 .then(stream => {
-                    vid.srcObject = stream; // don't use createObjectURL(MediaStream)
-                    return vid.play(); // returns a Promise
+                    vid.srcObject = stream; 
+                    return vid.play();
                 })
-                .then(() => { // enable the button
+                .then(() => {
                     const btn = document.querySelector('button');
                     btn.disabled = false;
                     btn.onclick = e => {
@@ -97,19 +106,18 @@
                 .catch(e => console.log(e));
 
             function takeASnap() {
-                const canvas = document.createElement('canvas'); // create a canvas
+                const canvas = document.createElement('canvas');
                 canvas.style.display = "none"
-                const ctx = canvas.getContext('2d'); // get its context
-                canvas.width = vid.videoWidth; // set its size to the one of the video
+                const ctx = canvas.getContext('2d');
+                canvas.width = vid.videoWidth;
                 canvas.height = vid.videoHeight;
-                ctx.drawImage(vid, 0, 0); // the video
+                ctx.drawImage(vid, 0, 0);
                 return new Promise((res, rej) => {
-                    canvas.toBlob(res, 'image/jpeg'); // request a Blob from the canvas
+                    canvas.toBlob(res, 'image/jpeg');
                 });
             }
 
             function download(blob) {
-                // uses the <a download> to download a Blob
                 let a = document.createElement('a');
                 a.href = URL.createObjectURL(blob);
                 a.download = 'screenshot.jpg';

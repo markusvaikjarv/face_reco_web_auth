@@ -7,6 +7,7 @@ import datetime
 import face_recognition
 import hashlib
 
+salt = "648739fhpoevevedlsdsvkjfbue;?dkfbv745"
 db = SqliteDatabase('kasutajad.db')
 
 class Kasutaja(Model):
@@ -43,7 +44,7 @@ def login_upload():
     upload = request.files.get('upload')
     kasutajanimi = request.forms.get('kasutajanimi')
     parool = request.forms.get('parool')
-    hashed_parool = hashlib.sha256(str(parool).encode('utf-8')).hexdigest()
+    hashed_parool = hashlib.sha256(str(parool + salt).encode('utf-8')).hexdigest()
 
     kasutaja = Kasutaja.get(Kasutaja.kasutajanimi == kasutajanimi)
 
@@ -105,7 +106,7 @@ def register_upload():
     upload     = request.files.get('upload')
     kasutajanimi = request.forms.get('kasutajanimi')
     parool = request.forms.get('parool')
-    hashed_parool = hashlib.sha256(str(parool).encode('utf-8')).hexdigest()
+    hashed_parool = hashlib.sha256(str(parool + salt).encode('utf-8')).hexdigest()
     print(hashed_parool)
 
     _, ext = os.path.splitext(upload.filename) #_ on failinimi ilma extensionita

@@ -72,6 +72,9 @@
         }
     </style>
     <script>
+        (() => {if(performance.navigation.type == 2){
+            location.reload(true);
+        }})() //vajalik selleks, et "tagasi" nuppu vajutades form puhas oleks
         function take_picture() {
             document.getElementById("kaameranupp").innerText = "Salvesta pilt"
             const vid = document.querySelector('video');

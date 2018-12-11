@@ -7,7 +7,7 @@ import face_recognition
 import hashlib
 
 
-salt = "648739fhpoevevedlsdsvkjfbue;?dkfbv745"
+salt = "648739fhpoevevedlsdsvkjfbue;?dkfbv745" #asenda suvalise kombinatsiooniga
 db = SqliteDatabase('kasutajad.db')
 
 
@@ -17,8 +17,7 @@ class Kasutaja(Model):
     kasutaja_tekst = TextField()
 
     class Meta:
-        database = db  # This model uses the "people.db" database.
-
+        database = db  
 
 db.connect()
 db.create_tables([Kasutaja])
@@ -55,7 +54,6 @@ def update_notepad():
     if kasutaja.parool == hashed_parool:
         kasutaja.kasutaja_tekst = tekst.strip()
         kasutaja.save()
-        print(kasutaja.kasutaja_tekst, "\nja tava tekst:\n", tekst)
         return template("./templates/notepad.tpl", kasutajanimi=kasutajanimi, parool=hashed_parool, tekst=kasutaja.kasutaja_tekst)
 
 
@@ -82,11 +80,11 @@ def login_upload():
     if ext not in ('.png', '.jpg', '.jpeg'):
         return 'File extension not allowed.'
     upload.filename = str(datetime.datetime.now())+".jpg"
-    save_path = os.getcwd()+"/uploadid/"
+    save_path = os.getcwd()+"/uploads/"
     upload.save(save_path)  # failinimi lisatakse save_pathile automaatselt
 
     try:  # kontrollin EXIF rotation informatsiooni, vajadusel panen pildi õiget pidi
-        image = Image.open(os.getcwd()+"/uploadid/"+upload.filename)
+        image = Image.open(os.getcwd()+"/uploads/"+upload.filename)
         for orientation in ExifTags.TAGS.keys():
             if ExifTags.TAGS[orientation] == 'Orientation':
                 break
@@ -98,7 +96,7 @@ def login_upload():
             image = image.rotate(270, expand=True)
         elif exif[orientation] == 8:
             image = image.rotate(90, expand=True)
-        image.save(os.getcwd()+"/uploadid/"+upload.filename)
+        image.save(os.getcwd()+"/uploads/"+upload.filename)
         image.close()
 
     except (AttributeError, KeyError, IndexError):
@@ -109,7 +107,7 @@ def login_upload():
         known_image = face_recognition.load_image_file(
             os.getcwd()+"/kasutajad/"+kasutajanimi+".jpg")
         unknown_image = face_recognition.load_image_file(
-            os.getcwd()+"/uploadid/"+upload.filename)
+            os.getcwd()+"/uploads/"+upload.filename)
     except FileNotFoundError:
         return template("./templates/error.tpl", error="Antud kasutajat ei leidu")
 
@@ -141,7 +139,6 @@ def register_upload():
     parool = request.forms.get('parool')
     hashed_parool = hashlib.sha256(
         str(parool + salt).encode('utf-8')).hexdigest()
-    print(hashed_parool)
 
     # _ on failinimi ilma extensionita
     _, ext = os.path.splitext(upload.filename)

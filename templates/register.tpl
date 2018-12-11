@@ -79,12 +79,13 @@
         const isOpera = (!!window.opr && !!opr.addons) || !!window.opera || navigator.userAgent.indexOf(' OPR/') >= 0;
         const isChrome = !!window.chrome && !!window.chrome.webstore;
         const isBlink = (isChrome || isOpera) && !!window.CSS;
+
+
+        function take_picture() {
 // Kui leht on productionis siis viskab errori kui SSL ceri pole ja klient kasutab Chrome
 //        if (location.protocol !== 'https:') {
 //            if (isBlink) {alert("Kasutad Chromel põhinevat brauserit. Kuna veebilehel puudub SSL cert ei tööta ka veebikaamera funktsionaalsus. Proovi kasutada FireFoxi.")}
 //        }
-
-        function take_picture() {
             document.getElementById("kaameranupp").innerText = "Salvesta pilt"
             const vid = document.querySelector('video');
             vid.style.display = "none"

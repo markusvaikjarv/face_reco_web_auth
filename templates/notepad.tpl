@@ -33,6 +33,11 @@
         .textarea {
             height: 590px;
         }
+        @media only screen and (max-width: 600px) {
+            .textarea {
+                height: 450px;
+            }
+        }
         .is-hidden {
             display: None;
         }

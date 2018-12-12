@@ -50,7 +50,7 @@
         (() => {if(performance.navigation.type == 2){
             location.reload(true);
         }})() //vajalik selleks, et "tagasi" nuppu vajutades form puhas oleks
-        toastr.success('Salvestatud', '', {timeOut: 1500})
+        toastr.success('Salvestatud', '', {timeOut: 1500})  //igal page loadil/refreshil tekib toaster s6num
 
     </script>
 </body>

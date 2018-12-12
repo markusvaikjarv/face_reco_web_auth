@@ -6,23 +6,26 @@ import datetime
 import face_recognition
 import hashlib
 
+##################################  ANDMEBAAS  ######################################
+salt = "648739fhpoevevedlsdsvkjfbue;?dkfbv745" #asenda suvalise kombinatsiooniga    #
+db = SqliteDatabase('kasutajad.db')                                                 #
+                                                                                    #
+                                                                                    #
+class Kasutaja(Model):                                                              #
+    kasutajanimi = CharField()                                                      #
+    parool = CharField()                                                            #
+    kasutaja_tekst = TextField()                                                    #
+                                                                                    #
+    class Meta:                                                                     #
+        database = db                                                               #
+                                                                                    #
+db.connect()                                                                        #
+db.create_tables([Kasutaja])                                                        #
+                                                                                    #
+#####################################################################################
 
-salt = "648739fhpoevevedlsdsvkjfbue;?dkfbv745" #asenda suvalise kombinatsiooniga
-db = SqliteDatabase('kasutajad.db')
 
-
-class Kasutaja(Model):
-    kasutajanimi = CharField()
-    parool = CharField()
-    kasutaja_tekst = TextField()
-
-    class Meta:
-        database = db  
-
-db.connect()
-db.create_tables([Kasutaja])
-
-
+###################################  ROUTES  ########################################
 @route('/')
 def index():
     return template("./templates/index.tpl")
@@ -54,7 +57,7 @@ def update_notepad():
     if kasutaja.parool == hashed_parool:
         kasutaja.kasutaja_tekst = tekst.strip()
         kasutaja.save()
-        return template("./templates/notepad.tpl", kasutajanimi=kasutajanimi, parool=hashed_parool, tekst=kasutaja.kasutaja_tekst)
+        return template("./templates/notepad.tpl", kasutajanimi=kasutajanimi, parool=hashed_parool, tekst=kasutaja.kasutaja_tekst)  #hashitud ja saltitud parool saadetakse frontendi n2htamatusse webformi. Peaks ymber tegema tokeni p6hiseks.
 
 
 @route('/notepad')
@@ -129,8 +132,7 @@ def login_upload():
             return template("./templates/error.tpl", error="Sisselogimine ebaõnnestus. Nägu ei vasta kasutajale.")
         return str(results[0])
     except NameError:
-        return "Fail"
-
+        return template("./templates/error.tpl", error="Teadmata viga!")
 
 @route('/registerupload', method='POST')
 def register_upload():
@@ -149,7 +151,6 @@ def register_upload():
     save_path = os.getcwd()+"/kasutajad/"
 
     try:
-        # appends upload.filename automatically upload.file on fail
         upload.save(save_path)
     except IOError:
         return template("./templates/error.tpl", error="Registreerimine ebaõnnestus. Antud nimega kasutaja juba eksisteerib")
@@ -189,5 +190,8 @@ def register_upload():
     return template("./templates/register_success.tpl")
 
 
+
+
+################################## KÄIVITUS  ########################################
 run(host='localhost', port=8080)
 # production: run(host='localhost', server='bjoern', port=8080)
